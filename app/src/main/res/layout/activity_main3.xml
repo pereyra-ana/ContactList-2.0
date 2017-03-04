@@ -8,7 +8,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.ana_pc.contactlist.Main3Activity">
+    android:background="#00FF00"
+    tools:context="com.ana_pc.contactlist.ContactPreviewFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,6 +29,7 @@
                 android:text="@string/icon_image"
                 android:paddingRight="10dp"
                 android:textSize="18dp"
+
                 />
 
             <TextView
@@ -58,25 +60,19 @@
         >
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:text="Name"
-            android:textStyle="bold"
-            android:textSize="18dp"/>
-
-        <TextView
-            android:id="@+id/nombre_de_persona"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:textSize="18dp"
+            style="@style/SuperLabel"
             />
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="18dp"
-            android:textStyle="bold"
+            android:id="@+id/nombre_de_persona"
+            android:text="Juancito"
+            style="@style/SuperValor"
+            />
+
+        <TextView
+            style="@style/SuperLabel"
+            android:textColor="#BB0000"
             android:text="Lastname"/>
 
         <TextView
@@ -105,11 +101,8 @@
                 />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:text="Email address"
-                android:textStyle="bold"
-                android:textSize="18dp"
+                style="@style/SuperLabel"
                 />
         </LinearLayout>
 
@@ -118,6 +111,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18dp"
+
             />
 
         <LinearLayout
@@ -137,11 +131,8 @@
                 />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:text="Phone number"
-                android:textStyle="bold"
-                android:textSize="18dp"
+                style="@style/SuperLabel"
                 />
         </LinearLayout>
 
@@ -159,17 +150,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <Button
+            android:id="@+id/delete_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete"
+            android:background="@drawable/bg_button"
+            android:layout_weight="1"/>
         <Button
             android:id="@+id/edit_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Edit"
+            android:background="@drawable/bg_blue"
             android:layout_weight="1"/>
         <Button
             android:id="@+id/dial_number_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_superbutton"
             android:text="Call"
             android:layout_weight="1"/>
     </LinearLayout>

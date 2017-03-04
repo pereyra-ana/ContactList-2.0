@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -19,6 +20,7 @@ import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,18 +34,12 @@ import static com.ana_pc.contactlist.DBHelper.COL_NAME;
 import static com.ana_pc.contactlist.DBHelper.COL_LASTNAME;
 import static com.ana_pc.contactlist.DBHelper.COL_EMAIL;
 import static com.ana_pc.contactlist.DBHelper.COL_PHONE;
-import static com.ana_pc.contactlist.DBHelper.COL_PHOTO;
 import static com.ana_pc.contactlist.DBHelper.TABLE_CONTACTS;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
-
-public class Main2Activity extends Fragment
+public class ContactFormFragment extends Fragment
 {
-    //private static final int REQUEST_CAMERA = 1888;
-    //private boolean fotoOk = false;
+    private static final int REQUEST_CAMERA = 1888;
+    private boolean fotoOk = false;
     private TextView nameView;
     private TextView lastnameView;
     private TextView emailView;
@@ -62,24 +58,24 @@ public class Main2Activity extends Fragment
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        nameView = (TextView) getActivity().findViewById(R.id.nombre_de_persona);
-        lastnameView = (TextView) getActivity().findViewById(R.id.lastName);
-        emailView = (TextView) getActivity().findViewById(R.id.emailAddress);
-        phoneView = (TextView) getActivity().findViewById(R.id.phoneNumber);
+        nameView = (TextView) view.findViewById(R.id.nombre_de_persona);
+        lastnameView = (TextView) view.findViewById(R.id.lastName);
+        emailView = (TextView) view.findViewById(R.id.emailAddress);
+        phoneView = (TextView) getView().findViewById(R.id.phoneNumber);
         //photoView = (ImageView) findViewById(R.id.image_contact);
 
         Typeface font = Typeface.createFromAsset( getActivity().getAssets(), "fontawesome-webfont.ttf" );
 
-        TextView iconMailView = (TextView)getActivity().findViewById(R.id.icon_mail);
+        TextView iconMailView = (TextView)view.findViewById(R.id.icon_mail);
         iconMailView.setTypeface(font);
 
-        TextView iconPhoneView = (TextView)getActivity().findViewById(R.id.icon_phone);
+        TextView iconPhoneView = (TextView)getView().findViewById(R.id.icon_phone);
         iconPhoneView.setTypeface(font);
 
-        TextView editUserImage = (TextView)getActivity().findViewById(R.id.icon_edit);
+        TextView editUserImage = (TextView)getView().findViewById(R.id.icon_edit);
         editUserImage.setTypeface(font);
 
-        /*TextView editImage = (TextView)findViewById(R.id.edit_image);
+        TextView editImage = (TextView)getView().findViewById(R.id.edit_image);
         editImage.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -92,11 +88,11 @@ public class Main2Activity extends Fragment
                  photoFile = createImageFile();
              } catch (IOException ex) {
                  // Error occurred while creating the File
-                 Toast.makeText(Main2Activity.this, "Error taking photo", Toast.LENGTH_LONG).show();
+                 Toast.makeText(getActivity(), "Error taking photo", Toast.LENGTH_LONG).show();
                  return;
              }
              if (photoFile != null) {
-                 Uri photoURI = FileProvider.getUriForFile(Main2Activity.this,
+                 Uri photoURI = FileProvider.getUriForFile(getActivity(),
                          "com.ana_pc.contactlist",
                          photoFile);
                  intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
@@ -105,9 +101,7 @@ public class Main2Activity extends Fragment
             }
             });
 
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();*/
-
-        Intent intent = getActivity().getIntent();
+                Intent intent = getActivity().getIntent();
         final long id = intent.getLongExtra("personID", 0);
         final DBHelper bh = new DBHelper(getActivity());
         final String idString = Long.toString(id);
@@ -188,37 +182,44 @@ public class Main2Activity extends Fragment
                 intent.putExtra("personID", id);
                 FragmentManager manager = getFragmentManager();
                 FragmentTransaction transaction = manager.beginTransaction();
-                MainActivity fragment = new MainActivity();
-                transaction.replace(R.id.container, fragment);
+//                ContactListFragment fragment = new ContactListFragment();
+//                transaction.replace(R.id.container, fragment);
+                transaction.remove(ContactFormFragment.this);
                 transaction.commit();
+
+
+                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+
                 //getActivity().setResult(getActivity().RESULT_OK, action);
                 //getActivity().finish();
             }
         });
     }
 
-    /*@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        /*if(requestCode == REQUEST_CAMERA){
+        if(requestCode == REQUEST_CAMERA){
             if(resultCode == Activity.RESULT_OK)
             {
                 Bitmap imageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath);
-                ImageView image = (ImageView) findViewById(R.id.image_contact);
+                ImageView image = (ImageView) getView().findViewById(R.id.image_contact);
                 image.setImageBitmap(imageBitmap);
                 fotoOk = true;
                 return;
             }
         }
-    }*/
+    }
 
-    /*String mCurrentPhotoPath;
+    String mCurrentPhotoPath;
 
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,
                 ".jpg",
@@ -228,41 +229,7 @@ public class Main2Activity extends Fragment
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
-    }*/
-
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    /*public Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("Main2 Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
-    }*/
 }

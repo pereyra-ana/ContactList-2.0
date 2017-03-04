@@ -1,163 +1,134 @@
 package com.ana_pc.contactlist;
 
 import android.app.Activity;
+
+import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.CursorAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.support.v4.widget.DrawerLayout;
 
-import static com.ana_pc.contactlist.DBHelper.COL_LASTNAME;
-import static com.ana_pc.contactlist.DBHelper.COL_NAME;
-import static com.ana_pc.contactlist.DBHelper.TABLE_CONTACTS;
-/**
- * Created by apereyra on 03/03/2017.
- */
+public class MainActivity extends Activity
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
-public class MainActivity extends Fragment {
-    private ListView lista;
-    private DBHelper dbHelper;
-    private CustomAdapter customAdapter;
+    /**
+     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
+     */
+    private NavigationDrawerFragment mNavigationDrawerFragment;
 
-    protected void initializeDB()
-    {
-        /* QUE ONDA CON ESTE ERROR:
-         java.lang.OutOfMemoryError: Failed to allocate a 23970828 byte allocation with 8388608 free bytes and 20MB until OOM
+    /**
+     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
+     */
+    private CharSequence mTitle;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main4);
+
+        mNavigationDrawerFragment = (NavigationDrawerFragment)
+                getFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mTitle = getTitle();
+
+        // Set up the drawer.
+        mNavigationDrawerFragment.setUp(
+                R.id.navigation_drawer,
+                (DrawerLayout) findViewById(R.id.drawer_layout));
+    }
+
+    @Override
+    public void onNavigationDrawerItemSelected(int position) {
+        // update the main content by replacing fragments
+        FragmentManager manager = getFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        switch (position) {
+            case 0:
+                ContactListFragment fragment0 = new ContactListFragment();
+                transaction.replace(R.id.container, fragment0);
+                transaction.commit();
+                break;
+            case 1:
+                PhoneDialFragment fragment1 = new PhoneDialFragment();
+                transaction.replace(R.id.container, fragment1);
+                transaction.commit();
+                break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        int count = getFragmentManager().getBackStackEntryCount();
+
+        if (count == 0) {
+            super.onBackPressed();
+            //additional code
+        } else {
+            getFragmentManager().popBackStack();
+        }
+
+    }
+
+    public void onSectionAttached(int number) {
+        switch (number) {
+            case 1:
+                mTitle = getString(R.string.title_section1);
+                break;
+            case 2:
+                mTitle = getString(R.string.title_section2);
+                break;
+        }
+    }
+
+    public void restoreActionBar() {
+        ActionBar actionBar = getActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(mTitle);
+    }
+
+    /**
+     * A placeholder fragment containing a simple view.
+     */
+    public static class PlaceholderFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
          */
-        dbHelper = new DBHelper(getActivity());
+        private static final String ARG_SECTION_NUMBER = "section_number";
 
-        // recupero datos de la base de datos
-        SQLiteDatabase dbWrite = dbHelper.getWritableDatabase();
-        Cursor cursor = dbWrite.rawQuery("SELECT * FROM " + TABLE_CONTACTS + " ORDER BY name ASC", null);
+        public PlaceholderFragment() {
+        }
 
-        customAdapter = new CustomAdapter(getActivity(), cursor);
-        lista = (ListView)getActivity().findViewById(R.id.lista);
-        lista.setAdapter(customAdapter);
-        lista.setOnItemClickListener(new ListView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position,
-                                    long id) {
-                Intent intent = getActivity().getIntent();
-                intent.putExtra("personID", id);
-                FragmentManager manager = getFragmentManager();
-                FragmentTransaction transaction = manager.beginTransaction();
-                Main3Activity fragment3 = new Main3Activity();
-                transaction.replace(R.id.container, fragment3);
-                transaction.addToBackStack(null);
-                transaction.commit();
-
-                /*Intent intent = new Intent(getActivity(), Main3Activity.class);
-                intent.putExtra("personID", id);
-                // TODO - not handled!
-                startActivityForResult(intent,86);*/
-            }
-        });
-
-        getActivity().findViewById(R.id.add).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                /*Intent intent = new Intent(getActivity(), Main2Activity.class);
-                startActivityForResult(intent, 85);*/
-                getActivity().getIntent().putExtra("personID", 0);
-                FragmentManager manager = getFragmentManager();
-                FragmentTransaction transaction = manager.beginTransaction();
-                Main2Activity fragment2 = new Main2Activity();
-                transaction.replace(R.id.container, fragment2);
-                transaction.addToBackStack(null);
-                transaction.commit();
-            }
-        });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        this.initializeDB();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
-        View rootView = inflater.inflate(R.layout.activity_main, container, false);
-        return rootView;
-    }
-
-
-        /*@Override
-        protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-            super.onActivityResult(requestCode, resultCode, data);
-
-            if(requestCode == 85){
-                if(resultCode == Activity.RESULT_OK)
-                {
-                    if ("true".equals(data.getStringExtra("create")))
-                    {
-                        Toast.makeText(getActivity(), "User " + data.getStringExtra("fullname") + " created", Toast.LENGTH_LONG).show();
-                    }
-                    else
-                    {
-                        Toast.makeText(getActivity(), "User " + data.getStringExtra("fullname") + " updated", Toast.LENGTH_LONG).show();
-                    }
-
-                    customAdapter.notifyDataSetChanged();
-                }
-            }
-        }*/
-
-    public class CustomAdapter extends CursorAdapter {
-
-        public CustomAdapter(Context context, Cursor cursor){
-            super(context, cursor, true);
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static PlaceholderFragment newInstance(int sectionNumber) {
+            PlaceholderFragment fragment = new PlaceholderFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
         }
 
         @Override
-        public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            LayoutInflater li = getActivity().getLayoutInflater();
-            View newView = li.inflate(R.layout.row_persona,parent, false);
-
-            String name = cursor.getString(cursor.getColumnIndex(COL_NAME));
-            String lastname = cursor.getString(cursor.getColumnIndex(COL_LASTNAME));
-            //String photo = cursor.getString(cursor.getColumnIndex(COL_PHOTO));
-
-            TextView nameView = (TextView) newView.findViewById(R.id.nombre_de_persona);
-            //ImageView photoView = (ImageView) newView.findViewById(R.id.contact_photo);
-
-            String fullname = (lastname != null && !lastname.equals("")) ? name + " " + lastname : name;
-            nameView.setText(fullname);
-            /*if(photo != null) {
-                photoView.setImageBitmap(BitmapFactory.decodeFile(photo));
-            }*/
-            return newView;
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_main4, container, false);
+            return rootView;
         }
 
         @Override
-        public void bindView(View view, Context context, Cursor cursor) {
-            String name = cursor.getString(cursor.getColumnIndex(COL_NAME));
-            //String photo = cursor.getString(cursor.getColumnIndex(COL_PHOTO));
-
-            TextView nameView = (TextView) view.findViewById(R.id.nombre_de_persona);
-            //ImageView photoView = (ImageView) view.findViewById(R.id.contact_photo);
-
-            nameView.setText(name);
-            /*if(photo != null)
-            {
-                photoView.setImageBitmap(BitmapFactory.decodeFile(photo));
-            }
-            else
-            {
-                photoView.setImageResource(R.drawable.user_image);
-            }*/
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            ((MainActivity) activity).onSectionAttached(
+                    getArguments().getInt(ARG_SECTION_NUMBER));
         }
     }
+
 }

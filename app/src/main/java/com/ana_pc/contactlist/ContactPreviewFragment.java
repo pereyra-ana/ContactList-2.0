@@ -1,31 +1,25 @@
 package com.ana_pc.contactlist;
 
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import static com.ana_pc.contactlist.DBHelper.COL_PHOTO;
 import static com.ana_pc.contactlist.DBHelper.TABLE_CONTACTS;
 
-public class Main3Activity extends Fragment {
+public class ContactPreviewFragment extends Fragment {
     private TextView nameView;
     private TextView lastnameView;
     private TextView emailView;
@@ -109,17 +103,45 @@ public class Main3Activity extends Fragment {
             }
         });
 
-        getActivity().findViewById(R.id.edit_btn).setOnClickListener(new View.OnClickListener() {
+        getView().findViewById(R.id.edit_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = getActivity().getIntent();
                 intent.putExtra("personID", id);
                 FragmentManager manager = getFragmentManager();
                 FragmentTransaction transaction = manager.beginTransaction();
-                Main2Activity fragment2 = new Main2Activity();
-                transaction.replace(R.id.container, fragment2);
+                ContactFormFragment fragment2 = new ContactFormFragment();
+                transaction.add(R.id.container, fragment2);
                 transaction.addToBackStack(null);
                 transaction.commit();
+            }
+        });
+
+        getView().findViewById(R.id.delete_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+                builder.setIcon(android.R.drawable.ic_delete);
+                builder.setTitle("Warning!");
+                builder.setMessage("Do you confirm to delete this person?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //@todo: Borramos a esta persona
+                    }
+                });
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //@todo: No hacer nada
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+
             }
         });
     }
@@ -153,7 +175,7 @@ public class Main3Activity extends Fragment {
         if(requestCode == 85){
             if(resultCode == Activity.RESULT_OK)
             {
-                Toast.makeText(Main3Activity.this, "User " + data.getStringExtra("fullname") + " updated", Toast.LENGTH_LONG).show();
+                Toast.makeText(ContactPreviewFragment.this, "User " + data.getStringExtra("fullname") + " updated", Toast.LENGTH_LONG).show();
             }
         }
     }*/
